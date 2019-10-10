@@ -4,10 +4,12 @@
 # SPDX-License-Identifier: Apache-2.0
 */
 
-import { spawn } from 'child_process';
-import ansi from 'strip-ansi';
 import chalk from 'chalk';
+import { spawn, StdioOptions } from 'child_process';
+import ansi from 'strip-ansi';
 import Result from './result';
+
+import * as logger from 'winston';
 
 // A general purpose structure that can be used for any command.
 // This defines the important 'spawn' command. This executes the command
@@ -20,14 +22,14 @@ import Result from './result';
 // It also blanks the arguments supplied, so the instance of the cmd can be reused
 // It returns a promise that is resolved when the exit code is 0, and rejected for any other code
 export default class Cmd {
-    public static async shell(cmds): Promise<Result[]> {
+    public static async shell(cmds, cache = true): Promise<Result[]> {
         const retvals: Result[] = [];
         for (const c of cmds) {
-            const cmd = new Cmd(c);
+            const cmd = new Cmd(c).cacheStdio(cache);
             await cmd.spawn();
             const result: Result = {
-                cmd : c,
-                rc : cmd.rc,
+                cmd: c,
+                rc: cmd.rc,
                 stderr: cmd.stderrstr,
                 stdout: cmd.stdoutstr,
             };
@@ -41,16 +43,21 @@ export default class Cmd {
     private stderrstr = [];
     private rc = 0;
 
+    // stdin - inherit, stdout - pipe, stderr - pipe
+    // i.e. be able to catch all of them
+    private stdioSettings: StdioOptions = ['inherit', 'pipe', 'pipe'];
+
     public constructor(cmd) {
         this.cmd = cmd;
     }
 
-    private stdioSettings =  ['inherit', 'pipe', 'pipe'];
-    public cachedStd(flag: boolean) {
-        if(flag){
-            this.stdioSettings =  ['inherit', 'pipe', 'pipe'];
+    public cacheStdio(flag: boolean) {
+        if (flag) {
+            this.stdioSettings = ['inherit', 'pipe', 'pipe'];
         } else {
-           this.stdioSettings =  ['inherit', 'inherit', 'inherit'];
+            this.stdioSettings = ['inherit', 'inherit', 'inherit'];
+        }
+        return this;
     }
 
     // can override the cwd
@@ -59,7 +66,7 @@ export default class Cmd {
             const _name = this.toString();
             // eslint-disable-next-line no-console
             console.log(chalk`{green spawning::} ${_name} in ${cwd}`);
-            const call = spawn(this.cmd, this.args, { env: process.env, shell: true, stdio: ['inherit', 'pipe', 'pipe'], cwd });
+            const call = spawn(this.cmd, this.args, { env: process.env, shell: true, stdio: this.stdioSettings, cwd });
             this.args = [];
             this.stdoutstr = [];
             call.on('exit', (code) => {
@@ -70,18 +77,23 @@ export default class Cmd {
                 resolve(code);
 
             });
-            call.stdout.on('data', (data) => {
-                let s = data.toString('utf8');
-                s = s.slice(0, s.length - 1);
-                console.log(chalk`{blue.bold [stdout]} ${s}`);
-                this.stdoutstr.push(ansi(s));
-            });
-            call.stderr.on('data', (data) => {
-                let s = data.toString('utf8');
-                s = s.slice(0, s.length - 1);
-                console.error(chalk`{red.bold [stderror]} ${s}`);
-                this.stderrstr.push(ansi(s));
-            });
+            if (call.stdout) {
+                call.stdout.on('data', (data) => {
+                    let s = data.toString('utf8');
+                    s = s.slice(0, s.length - 1);
+                    logger.debug(chalk`{blue.bold [stdout]} ${s}`);
+                    this.stdoutstr.push(ansi(s));
+                });
+            }
+
+            if (call.stderr) {
+                call.stderr.on('data', (data) => {
+                    let s = data.toString('utf8');
+                    s = s.slice(0, s.length - 1);
+                    logger.debug(chalk`{red.bold [stderror]} ${s}`);
+                    this.stderrstr.push(ansi(s));
+                });
+            }
             return call;
         });
 

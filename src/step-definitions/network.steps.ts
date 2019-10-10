@@ -1,8 +1,14 @@
-import { assert } from 'chai';
+/*
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+*/
 import { binding, given, then, when } from 'cucumber-tsflow';
-import { LONG_STEP, FABRIC_STATE } from '../timeouts';
-import Workspace from './workspace';
+import { FABRIC_STATE, LONG_STEP } from '../constants';
 import Cmd from '../shell/cmd';
+import Workspace from './workspace';
+
+import * as logger from 'winston';
 
 import { StateStore } from './statestore';
 const stateStore = StateStore.getInstance();
@@ -18,6 +24,7 @@ export class NetworkSteps {
   */
   @given(/The network has been started/, null, LONG_STEP)
   public async startNetwork(): Promise<void> {
+
     process.env.COMPOSE_PROJECT_NAME = 'first-network';
 
     const fabricState = stateStore.get(FABRIC_STATE);
@@ -31,7 +38,7 @@ export class NetworkSteps {
         'docker rmi $(docker images | grep "^dev-peer0.org[12].example.com" | awk \'{print $3}\') || echo ok',
 
         'docker-compose -f network-resources/first-network/docker-compose-cli.yaml down --volumes',
-        'docker-compose -f network-resources/first-network/docker-compose-cli.yaml up -d']);
+        'docker-compose -f network-resources/first-network/docker-compose-cli.yaml up -d'], false);
       stateStore.set(FABRIC_STATE, { deployed: true });
     }
 
@@ -48,15 +55,16 @@ export class NetworkSteps {
       fabricState.channel = true;
       stateStore.set(FABRIC_STATE, fabricState);
     }
+    
   }
 
   @then(/I submit a transaction '(.+?)' with arguments '(.+?)'/)
   // @then('I can submit a transaction {string} with result {string}')
   public async stuff(name, args): Promise<void> {
 
-    let argsToSend = { Args: [] };
+    const argsToSend = { Args: [] };
     argsToSend.Args.push(name),
-      argsToSend.Args = argsToSend.Args.concat(JSON.parse(args));
+    argsToSend.Args = argsToSend.Args.concat(JSON.parse(args));
 
     // will put all the logic here but quite a bit to move around later
     const str = `docker exec cli peer chaincode invoke -C mychannel -n basic -c '${JSON.stringify(argsToSend)}' --waitForEvent --peerAddresses peer0.org1.example.com:7051 --peerAddresses peer0.org1.example.com:7051 2>&1 `;
@@ -67,9 +75,7 @@ export class NetworkSteps {
 
   @then(/The result should be succes/)
   public async success(): Promise<void> {
-    // console.log('----------------------------------------------');
-    // console.log(this.workspace.$results);
-    // console.log('----------------------------------------------');
+    logger.debug(this.workspace.$results);
     if (!this.workspace.isInvokeSuccess()) {
       throw new Error('Should have completed succesfully');
     }
@@ -77,13 +83,10 @@ export class NetworkSteps {
 
   @then(/The result should be failure/)
   public async falure(): Promise<void> {
-    // console.log('----------------------------------------------');
-    // console.log(this.workspace.$results);
-    // console.log('----------------------------------------------');
+    logger.debug(this.workspace.$results);
     if (this.workspace.isInvokeSuccess()) {
       throw new Error('Should have completed with failure');
     }
   }
-
 
 }
