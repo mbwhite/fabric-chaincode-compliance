@@ -2,7 +2,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import { AfterAll, BeforeAll } from 'cucumber';
+import { AfterAll, BeforeAll, setWorldConstructor } from 'cucumber';
 import * as fs from 'fs-extra';
 import * as path from 'path';
 
@@ -15,8 +15,6 @@ export default class Chaincodes {
 
     /** Basic for the moment */
     public static setup(): void {
-
-        console.log(this);
 
         console.log('Copying over the test chaincodes..');
         const src = path.resolve(__dirname, '..', 'DEMO_CHAINCODE');
@@ -36,4 +34,4 @@ BeforeAll(() => {
 
 AfterAll(() => {
     console.log('==> Please remember to shut down fabric if not needed for debug ');
-})
+});
