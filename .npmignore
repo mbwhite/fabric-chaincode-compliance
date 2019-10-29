@@ -1,0 +1,16 @@
+.git/
+
+# for npm
+node_modules/
+npm-shrinkwrap.json
+
+# codes
+test/
+
+# misc
+example/
+.gitignore
+.editorconfig
+tslint.json
+
+npm-debug.log

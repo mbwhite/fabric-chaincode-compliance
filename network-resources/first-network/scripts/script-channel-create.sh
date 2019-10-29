@@ -1,14 +1,7 @@
 #!/bin/bash
 
-echo
-echo " ____    _____      _      ____    _____ "
-echo "/ ___|  |_   _|    / \    |  _ \  |_   _|"
-echo "\___ \    | |     / _ \   | |_) |   | |  "
-echo " ___) |   | |    / ___ \  |  _ <    | |  "
-echo "|____/    |_|   /_/   \_\ |_| \_\   |_|  "
-echo
-echo "Build your first network (BYFN) end-to-end test"
-echo
+echo "Creating channel, joining to orgs, and update peers"
+
 CHANNEL_NAME="$1"
 DELAY="$2"
 LANGUAGE="$3"
@@ -23,6 +16,9 @@ LANGUAGE=`echo "$LANGUAGE" | tr [:upper:] [:lower:]`
 COUNTER=1
 MAX_RETRY=10
 echo "Channel name : "$CHANNEL_NAME
+
+# set the log files a streaming
+docker exec -d logspout sh -c 'wget -q -O /logs/docker.log http://127.0.0.1:80/logs'
 
 # import utils
 . scripts/utils.sh
@@ -71,17 +67,3 @@ echo "Updating anchor peers for org1..."
 updateAnchorPeers 0 1
 echo "Updating anchor peers for org2..."
 updateAnchorPeers 0 2
-
-CC_SRC_PATH="/opt/gopath/src/github.com/hyperledger/fabric/peer/chaincodes/basic"
-CC_NAME="basic"
-LANGUAGE="node"
-
-echo "Installing chaincode on peer 0, org 1"
-installChaincode 0 1
-echo "Installing chaincode on peer 0, org 2"
-installChaincode 0 2
-
-echo "Instantiating chaincode on peer 0, org 1"
-instantiateChaincode 0 1
-
-# exit 0
