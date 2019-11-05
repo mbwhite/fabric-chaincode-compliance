@@ -10,7 +10,7 @@
         "sourceMap":true
     },
     "include": [
-        "./src/**/*","src/step-definitions/**/*.ts"
+        "./src/**/*","./src/step-definitions/**/*.ts"
     ],  
     "exclude": [
         "./test/**/*",

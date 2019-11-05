@@ -62,3 +62,13 @@ typings/
 
 test-chaincodes/**/*
 dist/
+
+# Rush files
+common/temp/**
+package-deps.json
+
+# Rush files
+common/temp/**
+**/.rush/temp/**
+**/*.build.error.log
+**/*.build.log

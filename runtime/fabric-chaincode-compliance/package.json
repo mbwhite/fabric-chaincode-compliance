@@ -3,12 +3,9 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "tsc --build",
+    "build": "tsc --build && cp -r ../../resources/* .",
     "test": "./node_modules/.bin/cucumber-js -p default",
     "dev":"npm run build && npm pack && mv fabric-chaincode-compliance-1.0.0.tgz /home/matthew/github.com/mbwhite/nodejs-cc-compliance"
-  },
-  "bin": {
-    "fcc": "bin/cli.js"
   },
   "bin": {
     "fcc": "bin/cli.js"
