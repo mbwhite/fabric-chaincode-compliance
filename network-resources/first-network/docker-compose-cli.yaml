@@ -90,3 +90,14 @@ services:
       - peer1.org2.example.com
     networks:
       - byfn
+
+  logging:
+    container_name: logging
+    image: gliderlabs/logspout
+    networks:
+      - byfn
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./logs:/logs
+    ports:
+    - 17056:80      

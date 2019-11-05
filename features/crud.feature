@@ -1,16 +1,25 @@
-# features/bank-account.feature
+
+# crud.feature
+
 Feature: CRUD Shim APIs
 
-  Scenario: Put state APIs
-    Given The network has been started
-    And The channel and 'basic' chaincode has been deployed
-    And I have created an uuid called 'anid'
-    And I submit a transaction 'createMyAsset' with arguments '["<anid>","bond"]'
-    Then The result should be succesful
+  Background:
+    Given The 'first-network' network has been started
+    And The required channel has been created
+    And The 'crud' chaincode has been deployed
 
-  Scenario: Put state APIs
-    Given The network has been started
-    And The channel and chaincode has been deployed
-    And I submit a transaction 'createMyAsset' with arguments '["014","bond"]'
-    And I submit a transaction 'createMyAsset' with arguments '["014","bond"]'
-    Then The result should be failure
+  @put
+  Scenario: Should add a key
+    Given I can submit a transaction 'org.mynamespace.crud:putKey' with arguments '["newKey1","newValue1"]'
+    Then I can confirm the simple key 'newKey1' has value 'newValue1'
+
+  @put
+  Scenario: Should add a composite key
+    Given I can a transaction 'putKey' with arguments '["tim","green","newCompositeValue"]'
+    Then I can confirm the composite key 'tim:green' has value 'newCompositeValue'
+
+  @put
+  Scenario: Should update an existing key
+    Given I can submit a transaction 'putKey' with arguments '["newKey1","updatedValue1"]'
+    Then I can confirm the simple key 'newKey1' has value 'updatedValue1'
+

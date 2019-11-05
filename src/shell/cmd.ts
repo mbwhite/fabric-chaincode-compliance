@@ -22,11 +22,11 @@ import * as logger from 'winston';
 // It also blanks the arguments supplied, so the instance of the cmd can be reused
 // It returns a promise that is resolved when the exit code is 0, and rejected for any other code
 export default class Cmd {
-    public static async shell(cmds, cache = true): Promise<Result[]> {
+    public static async shell(cmds, cwd = process.cwd(), cache = true): Promise<Result[]> {
         const retvals: Result[] = [];
         for (const c of cmds) {
             const cmd = new Cmd(c).cacheStdio(cache);
-            await cmd.spawn();
+            await cmd.spawn(cwd);
             const result: Result = {
                 cmd: c,
                 rc: cmd.rc,
