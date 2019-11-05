@@ -10,6 +10,9 @@
   "bin": {
     "fcc": "bin/cli.js"
   },
+  "bin": {
+    "fcc": "bin/cli.js"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mbwhite/fabric-chaincode-compliance.git"
@@ -22,6 +25,13 @@
   },
   "homepage": "https://github.com/mbwhite/fabric-chaincode-compliance#readme",
   "devDependencies": {
+
+    "@types/chai": "^4.2.3",
+    "@types/cucumber": "^4.0.7",
+    "@types/yargs": "^13.0.3",
+    "ts-node": "^8.4.1",
+    "tslint": "^5.20.0",
+    "typescript": "^3.6.3"
 
   },
   "dependencies": {
@@ -43,5 +53,6 @@
     "ts-node": "^8.4.1",
     "tslint": "^5.20.0",
     "typescript": "^3.6.3"
+
   }
 }

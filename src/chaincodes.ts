@@ -38,5 +38,7 @@ BeforeAll(() => {
 });
 
 AfterAll(() => {
+
     logger.info('==> Please remember to shut down all Fabric  docker images if not needed for debug ');
+
 });

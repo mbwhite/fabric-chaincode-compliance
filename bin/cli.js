@@ -26,6 +26,7 @@ const settings = yargs.scriptName("fcc")
     choices: ['info', 'debug'],
     description: 'Set logging level',
     default: 'info'
+
   })
   .epilog('Thank for your compliance')
   .strict()
