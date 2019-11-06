@@ -351,13 +351,15 @@
     {
       "packageName": "generator-compliance",
       "projectFolder": "generator/generator-compliance",
-      "reviewCategory": "tools"
+      "reviewCategory": "tools",
+      "shouldPublish": true
     },
     // 
     {
       "packageName": "fabric-chaincode-compliance",
       "projectFolder": "runtime/fabric-chaincode-compliance",
-      "reviewCategory": "tools"
+      "reviewCategory": "tools",
+      "shouldPublish": true
     }
   ]
 }
